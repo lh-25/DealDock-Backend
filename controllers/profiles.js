@@ -1,40 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const jwt = require('jsonwebtoken');
+const verifyToken = require('../middleware/verify-token');
 
-
-const SALT_LENGTH = 12;
-
-router.post('/signup', async (req, res) => {
+router.get('/:userId', verifyToken, async (req, res) => {
     try {
-        const userInDatabase = await User.findOne({ username: req.body.username });
-        if (userInDatabase) {
-            return res.json({error: 'Username already taken.'});
+        if (req.user._id !== req.params.userId){
+            return res.status(401).json({ error: "Unauthorized"})
         }
-        const user = await User.create({
-            username: req.body.username,
-            hashedPassword: bcrypt.hashSync(req.body.password, SALT_LENGTH)
-        })
-        const token = jwt.sign({ username: user.username, _id: user._id }, process.env.JWT_SECRET);
-        res.status(201).json({ user, token });
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            res.status(404)
+            throw new Error('Profile not found.');
+        }
+        res.json({ user });
     } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.post('/signin', async (req, res) => {
-    try {
-        const user = await User.findOne({ username: req.body.username });
-        if (user && bcrypt.compareSync(req.body.password, user.hashedPassword)) {
-            const token = jwt.sign({ username: user.username, _id: user._id }, process.env.JWT_SECRET);
-            res.status(200).json({ token });
+        if (res.statusCode === 404) {
+            res.status(404).json({ error: error.message });
         } else {
-            res.status(401).json({ error: 'Invalid username or password.' });
+            res.status(500).json({ error: error.message });
         }
-    } catch (error) {
-        res.status(400).json({ error: error.message });
     }
 });
 
