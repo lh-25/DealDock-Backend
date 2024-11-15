@@ -10,9 +10,9 @@ router.use(verifyToken)
 // POST /products
 router.post('/', async (req, res) => {
   try {
-    req.body.author = req.user._id
+    req.body.seller = req.user._id
     const product = await Product.create(req.body)
-    product._doc.author = req.user
+    product._doc.seller = req.user
     res.status(201).json(product)
   } catch (error) {
     console.log(error)
@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({})
-      .populate('author')
+      .populate('seller')
       .sort({ createdAt: 'desc' });
     res.status(200).json(products);
   } catch (error) {
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:productId', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate('author')
+    const product = await Product.findById(req.params.productId).populate('seller')
     res.status(200).json(product)
   } catch (error) {
     res.status(500).json(error)
@@ -48,14 +48,14 @@ router.put('/:productId', async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
     // Check permissons
-    if (!product.author.equals(req.user._id)) {
+    if (!product.seller.equals(req.user._id)) {
       return res.status(403).send("You're not allowed to do that!")
     }
     // Update product
     const updatedproduct = await Product.findByIdAndUpdate(req.params.productId, req.body, { new: true })
 
-    // Append req.user to the author property
-    updatedproduct._doc.author = req.user
+    // Append req.user to the seller property
+    updatedproduct._doc.seller = req.user
 
     // Issue JSON response
     res.status(200).json(updatedproduct)
@@ -69,7 +69,7 @@ router.put('/:productId', async (req, res) => {
 router.delete('/:productId', async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
-    if (!product.author.equals(req.user._id)) {
+    if (!product.seller.equals(req.user._id)) {
       return res.status(403).send("You're not allowed to do that!")
     }
     const deletedproduct = await Product.findByIdAndDelete(req.params.productId)
