@@ -3,7 +3,7 @@ dotenv.config();
 const cors = require ('cors')
 const express = require ('express')
 const app = express () ;
-const mongoose = requrie ('mongoose');
+const mongoose = require ('mongoose');
 
 const profilesRouter = require('./controllers/profiles')
 const reviewsRouter = require ('./controllers/reviews')
