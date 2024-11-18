@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  roles: {
-    buyer: { type: Boolean, default: false },
-    seller: { type: Boolean, default: false }
-  },
   reviews: [reviewSchema] 
 })
 
