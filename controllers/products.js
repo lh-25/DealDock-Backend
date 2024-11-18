@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:productId', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate('seller')
+    const product = await Product.findById(req.params.productId).populate('seller','comments.author')
     res.status(200).json(product)
   } catch (error) {
     res.status(500).json(error)
@@ -74,6 +74,53 @@ router.delete('/:productId', async (req, res) => {
     }
     const deletedproduct = await Product.findByIdAndDelete(req.params.productId)
     res.status(200).json(deletedproduct)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
+
+// POST /products/:productId/comments
+
+router.post('/:productId/comments', async (req, res) => {
+  try {
+    req.body.author = req.user._id
+    const product = await Product.findById(req.params.productId)
+    console.log(product)
+    product.comments.push(req.body)
+    await product.save()
+    // Find the newly created comment 
+    const newComment = product.comments[product.comments.length - 1]
+    newComment._doc.author = req.user
+
+    //Respond with the newComment
+    res.status(201).json(newComment)
+
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
+// PUT /products/:productId/comments/:commentId
+router.put('/:productId/comments/:commentId', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId)
+    const comment = product.comments.id(req.params.commentId)
+    comment.text = req.body.text
+    await product.save()
+    res.status(200).json({ message: 'OK' })
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
+//DELETE /products/:productId/comments/:commentId
+router.delete('/:productId/comments/:commentId', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId)
+    product.comments.remove({ _id: req.params.commentId })
+    await product.save()
+    res.status(200).json({ message: 'Ok' })
   } catch (error) {
     res.status(500).json(error)
   }
