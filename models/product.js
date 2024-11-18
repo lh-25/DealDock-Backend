@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
 
 const commentSchema = new mongoose.Schema({
   text: { type: String, required: true },
@@ -12,7 +11,7 @@ const commentSchema = new mongoose.Schema({
     }
   ],
   createdAt: { type: Date, default: Date.now }
-});
+})
 
 
 const productSchema = new mongoose.Schema(
@@ -25,6 +24,6 @@ const productSchema = new mongoose.Schema(
     comments: [commentSchema]
   },
   { timestamps: true }
-);
+)
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', productSchema)
