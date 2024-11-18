@@ -24,8 +24,7 @@ const userSchema = new mongoose.Schema({
   roles: {
     buyer: { type: Boolean, default: false },
     seller: { type: Boolean, default: false }
-  },
-  reviews: [reviewSchema] 
+  }
 })
 
 userSchema.set('toJSON', {
@@ -37,4 +36,8 @@ userSchema.set('toJSON', {
 
 const User = mongoose.model('User', userSchema)
 
-module.exports = { User, reviewSchema }
+
+const Review = mongoose.model('Review', reviewSchema)
+
+
+module.exports = { User, Review }
