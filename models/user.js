@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema({
   hashedPassword: {
     type: String,
     required: true
-  },
-  roles: {
-    buyer: { type: Boolean, default: false },
-    seller: { type: Boolean, default: false }
   }
 })
 
