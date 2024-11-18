@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  reviews: [reviewSchema] 
 })
 
 userSchema.set('toJSON', {
@@ -33,4 +32,8 @@ userSchema.set('toJSON', {
 
 const User = mongoose.model('User', userSchema)
 
-module.exports = { User, reviewSchema }
+
+const Review = mongoose.model('Review', reviewSchema)
+
+
+module.exports = { User, Review }
