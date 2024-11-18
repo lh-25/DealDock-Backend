@@ -1,6 +1,7 @@
 const express = require('express')
 const verifyToken = require('../middleware/verify-token')
 const Product = require('../models/product')
+const { default: mongoose } = require('mongoose')
 const router = express.Router()
 
 // ========== Public Routes ===========
@@ -31,16 +32,29 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET products by user
+router.get('/my-products', async (req, res) => {
+  try {
+
+    const products = await Product.find({ seller: req.user._id })
+      .populate('seller')
+      .sort({ createdAt: 'desc' })
+    res.status(200).json(products)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
 // GET /products/:productId
 
 router.get('/:productId', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate('seller','comments.author')
+    const product = await Product.findById(req.params.productId).populate('seller', 'comments.author')
     res.status(200).json(product)
   } catch (error) {
     res.status(500).json(error)
   }
 })
+
 
 // PUT /products/:productId
 
@@ -86,7 +100,6 @@ router.post('/:productId/comments', async (req, res) => {
   try {
     req.body.author = req.user._id
     const product = await Product.findById(req.params.productId)
-    console.log(product)
     product.comments.push(req.body)
     await product.save()
     // Find the newly created comment 
