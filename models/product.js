@@ -18,7 +18,9 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true },
+    startingPrice: { type: Number, required: true },
+    currentPrice: { type: Number, required: true },
+    buyNowPrice: { type: Number, required: true },
     imgURL: { type: String, required: true },
     seller: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }, 
     comments: [commentSchema]
