@@ -18,8 +18,8 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    startingPrice: { type: Number, required: true },
-    currentPrice: { type: Number, required: true },
+    startingBid: { type: Number, required: true },
+    currentBid: { type: Number},
     buyNowPrice: { type: Number, required: true },
     imgURL: { type: String, required: true },
     seller: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }, 
