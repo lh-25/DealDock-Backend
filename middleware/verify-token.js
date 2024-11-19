@@ -1,17 +1,20 @@
+// middleware/verify-token.js
 const jwt = require('jsonwebtoken');
 
-function verifyToken(req, res, next) {
-    try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Assign decoded payload to req.user
-        req.user = decoded;
-        // Call next() to invoke the next middleware function
-        next();
-    } catch (error) {
-        // If any errors, send back a 401 status and an 'Invalid token.' error message
-        res.status(401).json({ error: 'Invalid authorization token.' });
+const verifyToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];  // Expecting 'Bearer <token>'
+
+    if (!token) {
+        return res.status(403).json({ error: 'No token provided.' });
     }
-}
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Token is not valid.' });
+        }
+        req.user = user;  // Attach the user data to the request object
+        next();
+    });
+};
 
 module.exports = verifyToken;

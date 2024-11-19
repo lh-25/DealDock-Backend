@@ -1,26 +1,26 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router();  // Ensure router is defined
 const User = require('../models/user');
-const verifyToken = require('../middleware/verify-token');
+const verifyToken = require('../middleware/verify-token');  // Assuming you have a middleware to verify the JWT token
 
+// Get a user's profile
 router.get('/:userId', verifyToken, async (req, res) => {
     try {
-        if (req.user._id !== req.params.userId){
-            return res.status(401).json({ error: "Unauthorized"})
+        // Ensure the logged-in user is the same as the user they are trying to access
+        if (req.user._id.toString() !== req.params.userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
         }
-        const user = await User.findById(req.user._id);
+
+        // Find the user by their ID
+        const user = await User.findById(req.params.userId);
         if (!user) {
-            res.status(404)
-            throw new Error('Profile not found.');
+            return res.status(404).json({ error: 'Profile not found' });
         }
-        res.json({ user });
+
+        res.status(200).json(user);
     } catch (error) {
-        if (res.statusCode === 404) {
-            res.status(404).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: error.message });
-        }
+        res.status(500).json({ error: error.message });
     }
 });
 
-module.exports = router;
+module.exports = router;  // Export the router so it can be used in server.js

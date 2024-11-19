@@ -1,22 +1,30 @@
+const express = require('express');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user'); 
 
-// Helper function to create a token
+const router = express.Router();  
+
+
 const createToken = (user) => {
   return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
-// Signup or SignIn Handler Example
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
   try {
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username or email already exists' });
+    }
+
     const user = await User.create({ username, email, password });
     const token = createToken(user);
 
     res.cookie('token', token, {
-      httpOnly: true, // Prevents JavaScript access
-      secure: process.env.NODE_ENV === 'production', // Ensures HTTPS in production
-      sameSite: 'strict', // Prevents CSRF attacks
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({ message: 'Account created successfully', user: { id: user._id, username: user.username } });
@@ -26,13 +34,15 @@ const signup = async (req, res) => {
   }
 };
 
-// SignOut Handler
+
 const signout = (req, res) => {
   res.clearCookie('token');
   res.json({ message: 'Signed out successfully' });
 };
 
-module.exports = {
-    signup,
-    signout
-}
+
+router.post('/signup', signup);
+router.post('/signout', signout);
+
+
+module.exports = router;
