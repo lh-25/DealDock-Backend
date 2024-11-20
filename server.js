@@ -9,7 +9,9 @@ const mongoose = require('mongoose');
 const profilesRouter = require('./controllers/profiles');
 const productsRouter = require('./controllers/products');
 const usersRouter = require('./controllers/users');
-const authRoutes = require('./controllers/auth');
+// const authRoutes = require('./controllers/auth');
+
+const PORT = process.env.PORT ? process.env.PORT : 3002
 
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -27,10 +29,10 @@ app.use(express.json());
 app.use('/users', usersRouter); 
 app.use('/profiles', profilesRouter); 
 app.use('/products', productsRouter); 
-app.use('/auth', authRoutes); 
-console.log(authRoutes)
+// app.use('/auth', authRoutes); 
+// console.log(authRoutes)
 
 
-app.listen(3002, () => {
+app.listen(PORT, () => {
   console.log('The express app is ready!');
 });

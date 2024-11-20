@@ -48,7 +48,7 @@ router.get('/my-products', async (req, res) => {
 
 router.get('/:productId', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate('seller', 'comments.author')
+    const product = await Product.findById(req.params.productId).populate(['seller', 'comments.author'])
     res.status(200).json(product)
   } catch (error) {
     res.status(500).json(error)
@@ -94,25 +94,52 @@ router.delete('/:productId', async (req, res) => {
 })
 
 
-// POST /products/:productId/comments
+router.patch('/:productId/bid', async (req, res) => {
+  try {
+    const { bid } = req.body; 
+    const product = await Product.findById(req.params.productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    
+    if (bid <= product.currentBid) {
+      return res.status(400).json({ error: 'Bid must be higher than the current bid' });
+    }
+
+    
+    product.currentBid = bid;
+    await product.save();
+
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Error updating bid:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 
 router.post('/:productId/comments', async (req, res) => {
   try {
-    req.body.author = req.user._id
-    const product = await Product.findById(req.params.productId)
-    product.comments.push(req.body)
-    await product.save()
-    // Find the newly created comment 
-    const newComment = product.comments[product.comments.length - 1]
-    newComment._doc.author = req.user
+    const product = await Product.findById(req.params.productId);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    //Respond with the newComment
-    res.status(201).json(newComment)
+    req.body.author = req.user._id;
+    product.comments.push(req.body);
+    await product.save();
 
+    const newComment = product.comments[product.comments.length - 1];
+    newComment._doc.author = req.user;
+
+    res.status(201).json(newComment);
   } catch (error) {
-    res.status(500).json(error)
+    console.error(error);
+    res.status(500).json(error);
   }
-})
+});
+
 
 // PUT /products/:productId/comments/:commentId
 router.put('/:productId/comments/:commentId', async (req, res) => {
