@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({})
-      .populate('seller', 'seller.username')
+      .populate('seller')
       .sort({ createdAt: 'desc' });
     res.status(200).json(products);
   } catch (error) {
@@ -48,7 +48,7 @@ router.get('/my-products', async (req, res) => {
 
 router.get('/:productId', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate('seller', 'comments.author', 'seller.username')
+    const product = await Product.findById(req.params.productId).populate(['seller', 'comments.author'])
     res.status(200).json(product)
   } catch (error) {
     res.status(500).json(error)
