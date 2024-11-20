@@ -11,6 +11,8 @@ const productsRouter = require('./controllers/products');
 const usersRouter = require('./controllers/users');
 // const authRoutes = require('./controllers/auth');
 
+const PORT = process.env.PORT ? process.env.PORT : 3002
+
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -31,6 +33,6 @@ app.use('/products', productsRouter);
 // console.log(authRoutes)
 
 
-app.listen(3002, () => {
+app.listen(PORT, () => {
   console.log('The express app is ready!');
 });
