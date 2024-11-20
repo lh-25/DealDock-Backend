@@ -97,7 +97,7 @@ router.delete('/:productId', async (req, res) => {
 router.patch('/:productId/bid', async (req, res) => {
   try {
     const { bid } = req.body; 
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.productId).populate(['seller', 'comments.author'])
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
