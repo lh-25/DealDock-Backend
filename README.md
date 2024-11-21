@@ -24,4 +24,4 @@ Find more details about the project and access the front-end repository here:  [
 1. Clone this repository.
 2. Install dependencies with `npm install`.
 3. Set up a `.env` file with the required variables (e.g., database URI, JWT secret).
-4. Run the server with `npm start`.
+4. Run the server with `nodemon server.js`.
