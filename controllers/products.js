@@ -4,11 +4,9 @@ const Product = require('../models/product')
 const { default: mongoose } = require('mongoose')
 const router = express.Router()
 
-// ========== Public Routes ===========
 
-// ========= Protected Routes =========
 router.use(verifyToken)
-// POST /products
+
 router.post('/', async (req, res) => {
   try {
     req.body.seller = req.user._id
@@ -20,7 +18,7 @@ router.post('/', async (req, res) => {
     res.status(500).json(error)
   }
 })
-// GET /products
+
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({})
@@ -32,7 +30,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET products by user
+
 router.get('/my-products', async (req, res) => {
   try {
 
@@ -44,7 +42,7 @@ router.get('/my-products', async (req, res) => {
     res.status(500).json(error)
   }
 })
-// GET /products/:productId
+
 
 router.get('/:productId', async (req, res) => {
   try {
@@ -56,29 +54,27 @@ router.get('/:productId', async (req, res) => {
 })
 
 
-// PUT /products/:productId
-
 router.put('/:productId', async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
-    // Check permissons
+
     if (!product.seller.equals(req.user._id)) {
       return res.status(403).send("You're not allowed to do that!")
     }
-    // Update product
+
     const updatedproduct = await Product.findByIdAndUpdate(req.params.productId, req.body, { new: true })
 
-    // Append req.user to the seller property
+
     updatedproduct._doc.seller = req.user
 
-    // Issue JSON response
+
     res.status(200).json(updatedproduct)
   } catch (error) {
     res.status(500).json(error)
   }
 })
 
-// DELETE /products/:productId
+
 
 router.delete('/:productId', async (req, res) => {
   try {
@@ -96,19 +92,19 @@ router.delete('/:productId', async (req, res) => {
 
 router.patch('/:productId/bid', async (req, res) => {
   try {
-    const { bid } = req.body; 
+    const { bid } = req.body;
     const product = await Product.findById(req.params.productId).populate(['seller', 'comments.author'])
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    
+
     if (bid <= product.currentBid) {
       return res.status(400).json({ error: 'Bid must be higher than the current bid' });
     }
 
-    
+
     product.currentBid = bid;
     await product.save();
 
@@ -141,7 +137,7 @@ router.post('/:productId/comments', async (req, res) => {
 });
 
 
-// PUT /products/:productId/comments/:commentId
+
 router.put('/:productId/comments/:commentId', async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
@@ -154,7 +150,7 @@ router.put('/:productId/comments/:commentId', async (req, res) => {
   }
 })
 
-//DELETE /products/:productId/comments/:commentId
+
 router.delete('/:productId/comments/:commentId', async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
