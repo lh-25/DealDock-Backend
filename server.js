@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const profilesRouter = require('./controllers/profiles');
 const productsRouter = require('./controllers/products');
 const usersRouter = require('./controllers/users');
-// const authRoutes = require('./controllers/auth');
+
 
 const PORT = process.env.PORT ? process.env.PORT : 3002
 
@@ -26,11 +26,9 @@ app.use(cors());
 app.use(express.json());
 
 
-app.use('/users', usersRouter); 
-app.use('/profiles', profilesRouter); 
-app.use('/products', productsRouter); 
-// app.use('/auth', authRoutes); 
-// console.log(authRoutes)
+app.use('/users', usersRouter);
+app.use('/profiles', profilesRouter);
+app.use('/products', productsRouter);
 
 
 app.listen(PORT, () => {
